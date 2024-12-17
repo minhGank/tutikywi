@@ -7,7 +7,7 @@ import { MdMailOutline } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-const MainNavigationBar = () => {
+const MainNavigationBar = ({ showOnlyLeftSide }) => {
   const { currentUser } = useSelector((state) => state.user);
   const location = useLocation();
   const [displaySearchBar, setDisplaySearchBar] = useState(false);
@@ -35,11 +35,12 @@ const MainNavigationBar = () => {
         <img src="/Icons/tutikywi_logo.png" />
         {/* <h3>CityTeam</h3> */}
       </Link>
-
       {/* main nav bar */}
 
       <div
-        className={`${displaySearchBar ? "" : "hidden"} div_for_search_bar `}
+        className={`${displaySearchBar ? "" : "hidden"} ${
+          showOnlyLeftSide ? "hidden" : ""
+        } div_for_search_bar `}
       >
         <div className="div_for_textArea">
           <textarea
@@ -53,8 +54,9 @@ const MainNavigationBar = () => {
       </div>
 
       {/* right nav bar */}
-
-      <div className="div_for_user_shortcut">
+      <div
+        className={`div_for_user_shortcut ${showOnlyLeftSide ? "hidden" : ""}`}
+      >
         {currentUser ? <MdNotificationsNone className="div_icon" /> : ""}
         {currentUser ? <MdMailOutline className="div_icon" /> : ""}
         <MdLanguage className="div_icon" />

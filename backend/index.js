@@ -6,7 +6,7 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-
+const fileUpload = require("express-fileupload");
 //import routes
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
@@ -16,6 +16,7 @@ dotenv.config();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
+app.use(fileUpload({ useTempFiles: true }));
 app.use(
   cors({
     origin: "http://localhost:5173", // Your frontend URL

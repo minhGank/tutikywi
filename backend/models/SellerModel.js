@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 
 const sellerSchema = mongoose.Schema(
   {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
     userId: {
       type: mongoose.Types.ObjectId,
       required: true,
@@ -18,7 +26,15 @@ const sellerSchema = mongoose.Schema(
       required: true,
       enum: ["New Seller", "Verified Seller", "Elite Seller"],
     },
-    username: {
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: string,
+      required: true,
+    },
+    displayName: {
       type: String,
       required: true,
       unique: true,
@@ -29,26 +45,44 @@ const sellerSchema = mongoose.Schema(
     age: {
       type: Number,
     },
-    workExperience: {
-      type: String,
-    },
+    workExperience: [
+      {
+        occupation: {
+          type: String,
+          required: true,
+        },
+        yearOfWorking: {
+          type: Number,
+          required: true,
+        },
+        locationOfJob: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     EducationHistory: {
       type: String,
     },
-    language: [
+    languages: [
       {
-        type: String,
-        default: "English",
+        language: {
+          type: String,
+          default: "English",
+          required: true,
+        },
+        level: {
+          type: String,
+          enum: ["Basic", "Conversational", "Fluent", "Native/Bilingual	"],
+          required: true,
+        },
       },
     ],
     city: {
       type: String,
       default: null,
     },
-    birthDay: {
-      type: Date,
-      default: null,
-    },
+
     description: {
       type: String,
     },

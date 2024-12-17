@@ -4,7 +4,7 @@ import MainNavigationBar from "../components/RootLayOut/MainNavigationBar";
 const RootLayout = () => {
   return (
     <>
-      <MainNavigationBar />
+      <MainNavigationBar show={false} />
       <Outlet />
     </>
   );

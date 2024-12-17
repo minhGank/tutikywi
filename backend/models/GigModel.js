@@ -11,8 +11,7 @@ const GigSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    category: {},
-    subCategory: {
+    category: {
       type: String,
       required: true,
       enum: [
@@ -43,11 +42,20 @@ const GigSchema = mongoose.Schema(
         "Moving Assistance",
       ],
     },
-    expectedWagePerHour: {
-      type: Number,
+    pricing: {
+      type: Object,
       required: true,
+      properties: {
+        type: {
+          type: String,
+          enum: ["hourly", "flat", "both"],
+          required: true,
+        },
+        hourlyWage: { type: Number },
+        flatFee: { type: Number },
+      },
     },
-    Gallery: [{ type: String, required: true }],
+    gallery: [{ type: String, required: true }],
     status: {
       type: String,
       enum: ["active", "drafted", "paused"],

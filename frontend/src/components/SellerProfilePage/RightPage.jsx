@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { IoAddCircle } from "react-icons/io5";
 
-const RightPage = () => {
+const RightPage = ({ setCreateNewGig }) => {
   const [selectedType, setSelectedType] = useState(1);
   return (
     <Container>
@@ -27,7 +27,12 @@ const RightPage = () => {
         </div>
       </div>
       <div className="display_gig_div">
-        <div className="creat_new_gig_square">
+        <div
+          className="creat_new_gig_square"
+          onClick={() => {
+            setCreateNewGig(true);
+          }}
+        >
           <IoAddCircle className="create_new_icon" />
           <span>Create a new Gig</span>
         </div>

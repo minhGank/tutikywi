@@ -157,7 +157,7 @@ const Container = styled.div`
   }
   .div_for_choosing_categories_and_some_examples {
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr 4fr;
     width: 100%;
     .div_for_categories {
       display: flex;
@@ -165,7 +165,7 @@ const Container = styled.div`
       justify-content: center;
       flex-direction: column;
       gap: 10px;
-      width: fit-content;
+      width: 180px;
       .div_for_each_categories {
         font-size: 16px;
         width: 100%;

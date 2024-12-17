@@ -6,12 +6,17 @@ import RootLayout from "./pages/RootLayout.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Seller from "./pages/Seller.jsx";
 import SellerProfile from "./pages/SellerProfile.jsx";
+import SellerSetup from "./pages/SellerSetup.jsx";
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/seller_onboarding",
+    element: <SellerSetup />,
   },
   {
     path: "/",

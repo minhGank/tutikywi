@@ -40,6 +40,8 @@ const Container = styled.div`
   .div_for_img {
     img {
       width: 220px;
+      height: 150px;
+      object-fit: cover;
     }
   }
   .div_for_seller_name_and_rate {
