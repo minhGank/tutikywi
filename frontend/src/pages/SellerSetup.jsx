@@ -4,27 +4,83 @@ import Avatar from "@mui/material/Avatar";
 import { useRef, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import languages from "../../utils/languagesArray";
+import languageOriginalList from "../../utils/languagesArray";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { FormControl, InputLabel } from "@mui/material";
+import { MdModeEdit } from "react-icons/md";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { toastFunction } from "../../utils/helperFunction";
+import { IoClose } from "react-icons/io5";
 
 const SellerSetup = () => {
   const avatarInputRef = useRef(null);
   const [showAddNewBox, setShowAddNewBox] = useState(true);
+  const [language, setLanguage] = useState([]);
   const [descriptionIsFocus, setDescriptionIsFocus] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [img, setImg] = useState("");
   const [description, setDescription] = useState("");
-  const [language, setLanguage] = useState([
-    {
-      language: "",
-      level: "",
-    },
-  ]);
+  const [languageList, setLanguageList] = useState(languageOriginalList);
 
+  //useState for edditing/ adding new languages
+  const [newLanguage, setNewLanguage] = useState("");
+  const [newLanguageLevel, setNewLanguageLevel] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [newLanguageIndex, setNewLanguageIndex] = useState(null);
+
+  //function to remove the language after got selected
+  const removeLanguageFromList = (languageSelected) => {
+    setLanguageList((prev) => {
+      const newLanguageArray = prev.filter(
+        (language) => language != languageSelected
+      );
+      return newLanguageArray;
+    });
+  };
+
+  //function to edit/add languages
+
+  const editAndAddLanguageFunction = () => {
+    if (!newLanguage || !newLanguageLevel) {
+      return;
+    }
+    if (isEditing) {
+      setLanguage((prev) =>
+        prev.map((languageCombo, index) =>
+          index == newLanguageIndex
+            ? { language: newLanguage, level: newLanguageLevel }
+            : languageCombo
+        )
+      );
+      setIsEditing(false);
+      resetNewLanguageStates();
+    } else {
+      if (language.some((l) => l.langauge == newLanguage)) {
+        return;
+      }
+      setLanguage((prev) => [
+        ...prev,
+        {
+          language: newLanguage,
+          level: newLanguageLevel,
+        },
+      ]);
+      removeLanguageFromList(newLanguage);
+      resetNewLanguageStates();
+    }
+  };
+
+  const resetNewLanguageStates = () => {
+    setNewLanguage();
+    setNewLanguageLevel();
+    setNewLanguageIndex();
+  };
+
+  //function to update input fields
   const updateInputFunction = (e, inputType) => {
     if (inputType == "firstName") {
       setFirstName(e.target.value);
@@ -40,11 +96,9 @@ const SellerSetup = () => {
     } else if (inputType == "description") {
       setDescription(e.target.value);
     } else if (inputType == "language") {
-      setLanguage((prev) => [
-        ...{
-          language: e.target.value,
-        },
-      ]);
+      setNewLanguage(e.target.value);
+    } else if (inputType == "level") {
+      setNewLanguageLevel(e.target.value);
     }
   };
 
@@ -146,7 +200,7 @@ const SellerSetup = () => {
           </div>
         </div>
         <div className="div_for_line">
-          <div className="div_for_label">
+          <div className="div_for_label" style={{ marginTop: "5px" }}>
             <h4>Description</h4>
             <span>*</span>
           </div>
@@ -158,7 +212,7 @@ const SellerSetup = () => {
               label={`${
                 !descriptionIsFocus
                   ? "Share a bit about yourself, your personallity, your work experience,... "
-                  : "Description"
+                  : "Descripion"
               }`}
               variant="outlined"
               value={description}
@@ -170,7 +224,7 @@ const SellerSetup = () => {
           </div>
         </div>
         <div className="div_for_line">
-          <div className="div_for_label">
+          <div className="div_for_label" style={{ marginTop: "5px" }}>
             <h4>Languages</h4>
             <span>*</span>
           </div>
@@ -185,9 +239,12 @@ const SellerSetup = () => {
               <div className="language_add_new_box">
                 <Autocomplete
                   disablePortal
-                  options={languages}
-                  sx={{ width: 650 }}
-                  value={language.language}
+                  options={languageList}
+                  sx={{ width: 950 }}
+                  value={newLanguage}
+                  onChange={(e, value) => {
+                    setNewLanguage(value);
+                  }}
                   renderInput={(params) => (
                     <TextField {...params} label="Language" />
                   )}
@@ -196,9 +253,9 @@ const SellerSetup = () => {
                   <InputLabel id="select-label">Level</InputLabel>
                   <Select
                     labelId="select-label"
-                    value={language.level}
+                    value={newLanguageLevel}
                     label="Level"
-                    onChange={() => updateInputFunction(e, "languageLevel")}
+                    onChange={(e) => updateInputFunction(e, "level")}
                   >
                     <MenuItem value={"Basic"}>Basic</MenuItem>
                     <MenuItem value={"Conversational"}>Conversational</MenuItem>
@@ -215,7 +272,14 @@ const SellerSetup = () => {
                 >
                   Cancel
                 </div>
-                <div className="addNewLanguagebButton addNewButton pointer">
+                <div
+                  onClick={() => {
+                    editAndAddLanguageFunction();
+                  }}
+                  className={` addNewButton  ${
+                    newLanguage && newLanguageLevel && "backgroundBlue pointer"
+                  }`}
+                >
                   Add
                 </div>
               </div>
@@ -227,15 +291,57 @@ const SellerSetup = () => {
                 <span>Level</span>
                 <span
                   onClick={() => setShowAddNewBox(true)}
-                  className="pointer"
+                  className="pointer colorBlue"
+                  style={{
+                    display: "flex",
+                    justifyContent: "end",
+                    alignItems: "center",
+                  }}
                 >
                   Add New
                 </span>
               </div>
+              {language &&
+                language.map((l, i) => (
+                  <div className="language_box">
+                    <span>{l.language}</span>
+                    <span>{l.level}</span>
+                    <span
+                      style={{
+                        display: "flex",
+                        justifyContent: "end",
+                        alignItems: "center",
+                        gap: "5px",
+                      }}
+                    >
+                      <MdModeEdit
+                        onClick={() => {
+                          setNewLanguage(l.language);
+                          setNewLanguageLevel(l.level);
+                          setNewLanguageIndex(i);
+                          setIsEditing(true);
+                        }}
+                        className="pointer"
+                      ></MdModeEdit>
+                      <IoClose
+                        className="pointer"
+                        onClick={() => {
+                          setLanguage((prev) =>
+                            prev.filter(
+                              (eachLanguage) =>
+                                eachLanguage.language != l.language
+                            )
+                          );
+                        }}
+                      />
+                    </span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </Container>
   );
 };
@@ -277,7 +383,7 @@ const Container = styled.div`
       .input_field {
         display: flex;
         gap: 10px;
-        width: 40%;
+        width: 50%;
 
         .language_add_new_box {
           display: flex;
@@ -287,6 +393,7 @@ const Container = styled.div`
           gap: 10px;
           border: solid 1px #c4c4c4;
           padding: 15px;
+          border-radius: 3px;
           .addNewLanguagebButton {
             border: solid 1px #c4c4c4;
             padding: 5px;
@@ -301,19 +408,46 @@ const Container = styled.div`
           }
 
           .addNewButton {
-            background-color: #dddddd !important;
-            color: #a0a0a0 !important;
+            background-color: #dddddd;
+            color: #a0a0a0;
+            border: solid 1px #c4c4c4;
+            padding: 5px;
+            width: 210px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 45px;
+            border-radius: 3px;
+            font-weight: 500;
+            transition: 0.5 ease;
           }
         }
         .showing_language_box {
           width: 100%;
           display: flex;
-          .language_box_title {
+          flex-direction: column;
+
+          .language_box {
             width: 100%;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1.5fr 0.5fr 1fr;
             justify-content: space-between;
             border: solid 1px #c4c4c4;
+            border-top: none;
             padding: 13px;
+            color: rgb(67, 67, 67);
+            font-weight: 500;
+          }
+          .language_box_title {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.5fr 0.5fr 1fr;
+            border: solid 1px #c4c4c4;
+            padding: 13px;
+            background-color: #f4f4f4;
+            color: rgb(67, 67, 67);
+            font-weight: 500;
+            border-radius: 3px 3px 0 0;
           }
         }
         .div_for_avatar {
@@ -341,6 +475,15 @@ const Container = styled.div`
     }
   }
   .pointer {
-    cursor: pointer;
+    cursor: pointer !important;
+  }
+  .colorBlue {
+    color: rgb(58, 127, 249) !important;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .backgroundBlue {
+    background-color: rgb(58, 127, 249) !important;
+    color: white !important;
   }
 `;
