@@ -8,13 +8,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyB3RiwDU3kJ63Ym7dktsg1Jj1RZTWUGHXY",
-  authDomain: "world-quest-9100e.firebaseapp.com",
-  projectId: "world-quest-9100e",
-  storageBucket: "world-quest-9100e.appspot.com",
-  messagingSenderId: "585946703414",
-  appId: "1:585946703414:web:d0bf64e92f2b7921e39a97",
-  measurementId: "G-6YWE4CN1KN",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema(
   {
+    sellerSetUp: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     img: {
       type: String,
       required: true,

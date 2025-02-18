@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("email-validator");
 const { generateFromEmail } = require("unique-username-generator");
+const RefreshToken = require("../models/RefreshToken");
 
 const inputValidation = (email, password) => {
   if (!email || !password) {
@@ -45,21 +46,34 @@ exports.login = async (req, res, next) => {
       });
     }
     //end of validation, login success
-    const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
+    const access_token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
+      expiresIn: "1m",
+    });
+    const refresh_token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
       expiresIn: "7d",
     });
+
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
-    res.cookie("token", token, {
+    const createRefreshToken = new RefreshToken({
+      userId: user._id,
+      token: refresh_token,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    await createRefreshToken.save();
+    res.cookie("refresh_token", refresh_token, {
       httpOnly: true, // prevents JavaScript access
-      secure: "production", // only sends cookie over HTTPS in production
-      sameSite: "strict", // helps prevent CSRF attacks
+      secure: false, //
+      // sameSite: "strict", // helps prevent CSRF attacks
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    console.log(refresh_token);
     return res.json({
       success: true,
       msg: "Login success",
       user: userWithoutPassword,
+      access_token: access_token,
     });
   } catch (error) {
     next(error);
@@ -115,36 +129,122 @@ exports.googleAuth = async (req, res, next) => {
         username: generateFromEmail(user.email, 5),
       });
       await newUser.save();
-      const token = jwt.sign({ id: newUser._id }, process.env.TOKEN_SECRET, {
-        expiresIn: "7d",
+      const access_token = jwt.sign(
+        { id: newUser._id },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: "15m",
+        }
+      );
+      const refresh_token = jwt.sign(
+        { id: newUser._id },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+      const storeRefreshToken = new RefreshToken({
+        userId: user._id,
+        token: token,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
-      res.cookie("token", token, {
+
+      await RefreshToken.save();
+      res.cookie("refresh_token", refresh_token, {
         httpOnly: true, // prevents JavaScript access
-        secure: "production", // only sends cookie over HTTPS in production
-        maxAge: 86400,
-        sameSite: "strict", // helps prevent CSRF attacks
+        secure: false, // only sends cookie over HTTPS in production
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        // sameSite: "strict", // helps prevent CSRF attacks
       });
       return res.json({
         success: true,
         msg: "Sign Up With Google Succeed",
         user: newUser,
+        access_token: access_token,
       });
     } else {
-      const token = jwt.sign({ id: findUser._id }, process.env.TOKEN_SECRET, {
-        expiresIn: "7d",
+      const access_token = jwt.sign(
+        { id: newUser._id },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: "15m",
+        }
+      );
+      const refresh_token = jwt.sign(
+        { id: newUser._id },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+      const storeRefreshToken = new RefreshToken({
+        userId: user._id,
+        token: token,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
-      res.cookie("token", token, {
+
+      await RefreshToken.save();
+      res.cookie("refresh_token", refresh_token, {
         httpOnly: true, // prevents JavaScript access
-        secure: "production", // only sends cookie over HTTPS in production
-        sameSite: "strict", // helps prevent CSRF attacks
-        maxAge: 86400,
+        secure: false, // only sends cookie over HTTPS in production
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        // sameSite: "strict", // helps prevent CSRF attacks
       });
       return res.json({
         success: true,
-        msg: "Sign In With Google Succeed",
-        user: findUser,
+        msg: "Sign Up With Google Succeed",
+        user: newUser,
+        access_token: access_token,
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getNewAccessToken = async (req, res, next) => {
+  try {
+    const oldRefreshToken = req.cookies.refresh_token;
+
+    const storedRefreshToken = await RefreshToken.findOne({
+      token: oldRefreshToken,
+    });
+    if (!storedRefreshToken || storedRefreshToken.expiresAt < new Date()) {
+      return res.status(401).json({
+        msg: "Invalid or expired token. Please log in again to complete this action",
+        success: false,
+      });
+    }
+    const newAccessToken = jwt.sign(
+      { id: storedRefreshToken.userId },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
+    const newRefreshToken = jwt.sign(
+      { id: storedRefreshToken.userId },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+    res.cookie("refresh_token", newRefreshToken, {
+      httpOnly: true, // prevents JavaScript access
+      secure: false, // only sends cookie over HTTPS in production
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      // sameSite: "strict", // helps prevent CSRF attacks
+    });
+
+    const storedNewRefreshToken = new RefreshToken({
+      userId: storedRefreshToken.userId,
+      token: newRefreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+    await storedNewRefreshToken.save();
+    await RefreshToken.deleteOne({ token: oldRefreshToken });
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      success: true,
+    });
   } catch (error) {
     next(error);
   }

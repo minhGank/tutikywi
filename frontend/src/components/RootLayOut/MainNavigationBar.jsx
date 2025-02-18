@@ -14,8 +14,8 @@ const MainNavigationBar = ({ showOnlyLeftSide }) => {
   const [displayBorderBottom, setDisplayBorderBottom] = useState(false);
 
   const [sellerDisplay, setSellerDisplay] = useState(false);
-  console.log(displaySearchBar);
-  console.log(location);
+  // console.log(displaySearchBar);
+  // console.log(location);
   useEffect(() => {
     // Determine search bar and seller display based on the location path
     if (location.pathname.includes("/seller")) {

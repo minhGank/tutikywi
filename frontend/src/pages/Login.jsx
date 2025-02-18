@@ -1,22 +1,29 @@
-import { useState } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
+
 import { toastFunction } from "../../utils/helperFunction";
 import styled from "styled-components";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import validator from "email-validator";
 import { googleSignInAuth, googleSignInProvider } from "../../utils/firebase";
 import { signInWithPopup } from "firebase/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../../redux/userSlice";
 //end of import
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [showSignUp, setShowSignUp] = useState(false);
   const [input, setInput] = useState({ email: "", password: "" });
+  const [searhParams] = useSearchParams();
+  const showSignUp = searhParams.get("mode") == "signup" ? true : false;
+  const { currentUser } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/");
+    }
+  }, [currentUser]);
 
   //input vaidation
   const inputValidation = (email, password) => {
@@ -54,10 +61,14 @@ const Login = () => {
         //submit sign in form
         dispatch(userAction.loginStart());
         if (!showSignUp) {
-          const res = await axios.post(`http://localhost:8000/auth/login`, {
-            email: input.email,
-            password: input.password,
-          });
+          const res = await axios.post(
+            `http://localhost:8000/auth/login`,
+            {
+              email: input.email,
+              password: input.password,
+            },
+            { withCredentials: true }
+          );
           //there're errors
           if (res.data.success == false) {
             dispatch(userAction.loginFail());
@@ -65,7 +76,12 @@ const Login = () => {
           }
           //form sign in submit success
           if (res.data.success) {
-            dispatch(userAction.loginSuccess(res.data.user));
+            dispatch(
+              userAction.loginSuccess({
+                user: res.data.user,
+                accessToken: res.data.access_token,
+              })
+            );
             return navigate("/");
           }
         } else {
@@ -78,7 +94,6 @@ const Login = () => {
             dispatch(userAction.loginFail());
             return toastFunction("error", res.data.msg);
           } else {
-            setShowSignUp(false);
             toastFunction("success", "Sign Up Succeed");
           }
         }
@@ -94,9 +109,13 @@ const Login = () => {
     dispatch(userAction.loginStart());
     signInWithPopup(googleSignInAuth, googleSignInProvider)
       .then(async (result) => {
-        const res = await axios.post(`http://localhost:8000/auth/googleAuth`, {
-          result,
-        });
+        const res = await axios.post(
+          `http://localhost:8000/auth/googleAuth`,
+          {
+            result,
+          },
+          { withCredentials: true }
+        );
         if (res.data.success) {
           toastFunction("success", res.data.msg);
           dispatch(userAction.loginSuccess(res.data.user));
@@ -119,7 +138,7 @@ const Login = () => {
           <FormContainer>
             <div className="div_for_auth">
               <div className="intro_div">
-                <p>Welcome to City Team</p>
+                <p>Welcome to Tutikywi</p>
                 <h1>Sign In</h1>
               </div>
               <div className="div_for_form">
@@ -163,14 +182,7 @@ const Login = () => {
                   </button>
                 </ModernSignInContainer>
                 <p>
-                  New to City Team?{" "}
-                  <a
-                    onClick={() => {
-                      setShowSignUp(true);
-                    }}
-                  >
-                    Join Now
-                  </a>
+                  New to Tutikywi? <Link to={`?mode=signup`}>Join Now</Link>
                 </p>
               </div>
             </div>
@@ -179,7 +191,7 @@ const Login = () => {
           <FormContainer>
             <div className="div_for_auth">
               <div className="intro_div">
-                <p>Welcome to City Team</p>
+                <p>Welcome to Tutikywi</p>
                 <h1>Sign Up</h1>
               </div>
               <div className="div_for_form">
@@ -222,36 +234,16 @@ const Login = () => {
                   </button>
                 </ModernSignInContainer>
                 <p>
-                  Already on City Team?{" "}
-                  <a
-                    onClick={() => {
-                      setShowSignUp(false);
-                    }}
-                  >
-                    Sign In
-                  </a>
+                  Already on Tutikywi? <Link to={``}>Sign In</Link>
                 </p>
               </div>
             </div>
           </FormContainer>
         )}
         <PicContainer>
-          <img src="/Icons/City Team.png" />
+          <img src="/Icons/tutikywi_text.png" />
         </PicContainer>
       </Container>
-
-      <ToastContainer
-        position="bottom-left"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
     </>
   );
 };
@@ -289,11 +281,18 @@ const FormContainer = styled.div`
     align-items: center;
     margin-top: 20vh;
     padding-left: 100px;
+    .intro_div {
+      width: 60%;
+      padding-left: 100px;
+    }
     .div_for_form {
       width: 60%;
       padding-left: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       p {
-        margin-left: 50px;
         font-size: 12px;
       }
       a {
@@ -315,8 +314,7 @@ const PicContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-right: 70px;
-  margin-top: 80px;
+  height: 100vh;
 `;
 
 //css for fieldset

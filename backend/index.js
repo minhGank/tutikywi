@@ -10,7 +10,7 @@ const fileUpload = require("express-fileupload");
 //import routes
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
-
+const sellerRoute = require("./routes/sellerRoute");
 //app.use libray and set up library
 dotenv.config();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,8 +26,8 @@ app.use(
 
 //app.use routes
 app.use("/auth/", authRoute);
-
 app.use("/user/", userRoute);
+app.use("/seller/", sellerRoute);
 
 app.use((error, req, res, next) => {
   const status = error.status || 500;
