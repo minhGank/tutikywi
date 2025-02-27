@@ -12,9 +12,7 @@ const SearchBar = ({ setResultFunction }) => {
       return;
     }
     try {
-      const res = await axios.get(
-        `http://localhost:8000/user/findQuest/${searchTerm}`
-      );
+      const res = await axios.get(``);
       setResultFunction(res.data);
     } catch (error) {
       toastFunction("error", error.message);

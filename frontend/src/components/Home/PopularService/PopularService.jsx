@@ -1,8 +1,13 @@
 import styled from "styled-components";
 import { useState } from "react";
 import ServiceExample from "./ServiceExamples";
+import test_plumber_seller_info from "../../../../testData/popularService";
+import test_house_cleaning_seller_info from "../../../../testData/popularCleaning";
+import test_pet_sitting_seller_info from "../../../../testData/popularPetSitter";
+import test_electrical_engineer_info from "../../../../testData/popularElectrical";
 const PopularService = () => {
   const [categoryType, setCategoryType] = useState(1);
+
   return (
     <Container>
       <h3>Explore Popular Services In Your Area:</h3>
@@ -51,95 +56,63 @@ const PopularService = () => {
         </div>
         {categoryType == 1 ? (
           <div className="div_for_service_example">
-            <ServiceExample
-              img={
-                "https://www.scoutnetworkblog.com/wp-content/uploads/2018/11/Plumber-Sink-201709-003.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://augerpros.com/wp-content/uploads/2022/08/plumbing-costs.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://cdn-dnbld.nitrocdn.com/NfqFWGwEhQpozpiSBtvSlumZGJCvggcI/assets/images/optimized/rev-369c446/johntheplumber.ca/wp-content/uploads/2024/02/plumbing-repairs-london-ontario-plumber.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://d17x34b9fcvxk7.cloudfront.net/static/marketing/images/hero-backgrounds/plumber.jpg"
-              }
-            />
+            {test_plumber_seller_info.map((s, i) => {
+              return (
+                <ServiceExample
+                  seller_description={s.seller_description}
+                  seller_name={s.seller_name}
+                  seller_rate={s.seller_rate}
+                  img={s.img}
+                  seller_rate_count={s.seller_rate_count}
+                  key={i}
+                />
+              );
+            })}
           </div>
         ) : categoryType == 2 ? (
           <div className="div_for_service_example">
-            <ServiceExample
-              img={
-                "https://homecleanheroes.com/augusta/wp-content/uploads/sites/14/2022/03/Home-Clean-Heroes-cleaner-wiping-down-baseboards.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://cdn.prod.website-files.com/640051ce8a159067e1042e74/65d5b19950d874f282b5c35f_woman-with-gloves-cleaning-floor_23-2148520978.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://www.doforms.com/wp-content/uploads/2023/10/professional-house-cleaning-checklist.jpeg%E2%80%8B.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://www.maids.com/wp-content/uploads/2022/12/bigstock-Handsome-Young-Man-Cleaning-Wi-276105073.jpg"
-              }
-            />
+            {test_house_cleaning_seller_info.map((s, i) => {
+              return (
+                <ServiceExample
+                  seller_description={s.seller_description}
+                  seller_name={s.seller_name}
+                  seller_rate={s.seller_rate}
+                  img={s.img}
+                  seller_rate_count={s.seller_rate_count}
+                  key={i}
+                />
+              );
+            })}
           </div>
         ) : categoryType == 3 ? (
           <div className="div_for_service_example">
-            <ServiceExample
-              img={
-                "https://www.housesittersuk.co.uk/files/Destinations/pet-sitting-house-sitting-06.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://www.petbusinessinsurance.co.uk/img/0-featured-man-giving-golden-labrador-he-is-pet-sitting-a-high-five.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://www.petsit.com/stuff/contentmgr/files/0/b54b67c8fc3178e47a4564632904324d/image/pet_sitters_international_main.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://images.ctfassets.net/2djrn56blv6r/1dOoUk87fqAuPN5r9uTDt8/b5f8f442439a28d0e33975e2956a8739/shutterstock_2048121821_header.jpg?fm=webp&q=75&w=3840"
-              }
-            />
+            {test_pet_sitting_seller_info.map((s, i) => {
+              return (
+                <ServiceExample
+                  seller_description={s.seller_description}
+                  seller_name={s.seller_name}
+                  seller_rate={s.seller_rate}
+                  img={s.img}
+                  seller_rate_count={s.seller_rate_count}
+                  key={i}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="div_for_service_example">
-            <ServiceExample
-              img={
-                "https://lirp.cdn-website.com/25f3632c/dms3rep/multi/opt/vancelectric-northern-virginia-install-generator-640w.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://www.electricianstoronto.ca/wp-content/uploads/2018/08/ELECTRICAL-REPAIRS-AND-MAINTENANCE.jpg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://3eelectrical.ca/wp-content/uploads/2021/10/electrical_questions-e1634777345165.jpeg"
-              }
-            />
-            <ServiceExample
-              img={
-                "https://primeappliancerepairs.com/wp-content/uploads/2022/07/repair-service-provider.jpg"
-              }
-            />
+            {test_electrical_engineer_info.map((s, i) => {
+              return (
+                <ServiceExample
+                  seller_description={s.seller_description}
+                  seller_name={s.seller_name}
+                  seller_rate={s.seller_rate}
+                  img={s.img}
+                  seller_rate_count={s.seller_rate_count}
+                  key={i}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -162,7 +135,7 @@ const Container = styled.div`
     .div_for_categories {
       display: flex;
       align-items: start;
-      justify-content: center;
+      justify-content: start;
       flex-direction: column;
       gap: 10px;
       width: 180px;
@@ -188,7 +161,7 @@ const Container = styled.div`
       justify-content: center;
       align-items: center;
       gap: 20px;
-      margin-left: 40px;
+      margin-left: 10px;
       width: 100%;
     }
   }

@@ -62,13 +62,14 @@ exports.login = async (req, res, next) => {
     });
 
     await createRefreshToken.save();
+
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true, // prevents JavaScript access
       secure: false, //
       // sameSite: "strict", // helps prevent CSRF attacks
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log(refresh_token);
+
     return res.json({
       success: true,
       msg: "Login success",
@@ -205,7 +206,6 @@ exports.googleAuth = async (req, res, next) => {
 exports.getNewAccessToken = async (req, res, next) => {
   try {
     const oldRefreshToken = req.cookies.refresh_token;
-
     const storedRefreshToken = await RefreshToken.findOne({
       token: oldRefreshToken,
     });

@@ -5,7 +5,7 @@ import { useState } from "react";
 import PopularService from "../../components/Home/PopularService/PopularService";
 const Home = () => {
   const [result, setResult] = useState("");
-  console.log("this is result", result);
+
   const setResultFunction = (value) => {
     setResult(value);
   };
