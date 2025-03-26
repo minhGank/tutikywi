@@ -9,4 +9,6 @@ router.post(
   sellerController.createSellerProfile
 );
 
+router.get("/getSeller", tokenVerify.verify, sellerController.getSeller);
+
 module.exports = router;

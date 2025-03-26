@@ -2,14 +2,16 @@ import styled from "styled-components";
 import { MdLocationOn } from "react-icons/md";
 import PortfolioEachLine from "./LeftPage/portfolioEachLine";
 
-const LeftPage = ({ currentUser }) => {
+const LeftPage = ({ currentSeller }) => {
   return (
     <Container>
       <div className="sellerProfileMain">
         <div className="profile_top">
-          <img src={currentUser.img}></img>
-          <h4>{"Your display name"}</h4>
-          <span>@{currentUser.username}</span>
+          <img src={currentSeller?.img}></img>
+          <h4>
+            {currentSeller?.firstName} {currentSeller?.lastName}
+          </h4>
+          <span>@{currentSeller?.displayName}</span>
         </div>
         <hr></hr>
         <div className="profile_bottom">
@@ -17,17 +19,25 @@ const LeftPage = ({ currentUser }) => {
             <span>
               <MdLocationOn /> From
             </span>
-            <span>{"Location"}</span>
+            <span>
+              {currentSeller?.city}, {currentSeller?.state},{" "}
+              {currentSeller?.country}
+            </span>
           </div>
         </div>
       </div>
       <div className="portfolio_div">
         <PortfolioEachLine
-          title={"Description"}
+          content={currentSeller?.description}
           subTitle={"Edit Description"}
+          title={"Description"}
         />
         <hr></hr>
-        <PortfolioEachLine title={"Language"} subTitle={"Add New"} />
+        <PortfolioEachLine
+          title={"Language"}
+          subTitle={"Add New"}
+          content={currentSeller?.language}
+        />
         <hr></hr>
         <PortfolioEachLine title={"Skills"} subTitle={"Add New"} />
       </div>
@@ -99,7 +109,7 @@ const Container = styled.div`
 
     border: solid 1px #d7d9dc;
     ${"" /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); */}
-    max-width: 80%;
+    max-width: 50%;
     min-width: 50%;
     padding: 20px 20px 15px 20px;
     hr {

@@ -9,7 +9,7 @@ const sellerSlice = createSlice({
   initialState,
   reducers: {
     sellerChange(state, action) {
-      state.seller = action.payload;
+      state.currentSeller = action.payload;
     },
   },
 });

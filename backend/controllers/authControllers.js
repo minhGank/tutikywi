@@ -49,9 +49,13 @@ exports.login = async (req, res, next) => {
     const access_token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
       expiresIn: "1m",
     });
-    const refresh_token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
-      expiresIn: "7d",
-    });
+    const refresh_token = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
@@ -150,7 +154,7 @@ exports.googleAuth = async (req, res, next) => {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
-      await RefreshToken.save();
+      await storeRefreshToken.save();
       res.cookie("refresh_token", refresh_token, {
         httpOnly: true, // prevents JavaScript access
         secure: false, // only sends cookie over HTTPS in production
@@ -184,7 +188,7 @@ exports.googleAuth = async (req, res, next) => {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
-      await RefreshToken.save();
+      await storeRefreshToken.save();
       res.cookie("refresh_token", refresh_token, {
         httpOnly: true, // prevents JavaScript access
         secure: false, // only sends cookie over HTTPS in production

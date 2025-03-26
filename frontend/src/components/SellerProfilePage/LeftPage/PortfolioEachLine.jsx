@@ -1,13 +1,13 @@
 import styled from "styled-components";
 
-const PortfolioEachLine = ({ title, subTitle }) => {
+const PortfolioEachLine = ({ title, subTitle, content }) => {
   return (
     <Container>
       <div className="portfolio_div_each_line_title">
         <h5>{title}</h5>
         <span>{subTitle}</span>
       </div>
-      <p>Description Text</p>
+      <p>{content}</p>
     </Container>
   );
 };

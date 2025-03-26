@@ -6,11 +6,11 @@ import { useState } from "react";
 import CreateGigPopUp from "../../components/SellerProfilePage/LeftPage/CreateGigPopUp";
 
 const SellerProfile = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentSeller } = useSelector((state) => state.seller);
   const [createNewGig, setCreateNewGig] = useState(false);
   return (
     <Container>
-      <LeftPage currentUser={currentUser} />
+      <LeftPage currentSeller={currentSeller} />
       <RightPage setCreateNewGig={setCreateNewGig} />
       {createNewGig && <CreateGigPopUp setCreateNewGig={setCreateNewGig} />}
     </Container>

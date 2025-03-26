@@ -15,11 +15,10 @@ import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { onboardingAction } from "../../../../redux/onboardingSlice";
-import Button from "@mui/material/Button";
 import IntroSection from "../../../components/sellerOnboarding/IntroSection";
 import SubmitButton from "../../../components/sellerOnboarding/submitButton";
 import ProcessBar from "../../../components/sellerOnboarding/ProcessBar";
-
+import { Country, State, City } from "country-state-city";
 const UpdatePersonalInfo = () => {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
@@ -33,6 +32,12 @@ const UpdatePersonalInfo = () => {
   const [displayName, setDisplayName] = useState(personalInfo.displayName);
   const [img, setImg] = useState(personalInfo.img);
   const [description, setDescription] = useState(personalInfo.description);
+  const [country, setCountry] = useState(Country.getAllCountries());
+  const [state, setState] = useState([]);
+  const [city, setCity] = useState([]);
+  const [currentCountry, setCurrentCountry] = useState();
+  const [currentState, setCurrentState] = useState();
+  const [currentCity, setCurrentCity] = useState();
   const [languageList, setLanguageList] = useState(languageOriginalList);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -84,7 +89,7 @@ const UpdatePersonalInfo = () => {
           level: newLanguageLevel,
         },
       ]);
-      console.log("imhere");
+
       removeLanguageFromList(newLanguage);
       resetNewLanguageStates();
     }
@@ -96,25 +101,54 @@ const UpdatePersonalInfo = () => {
     setNewLanguageIndex();
   };
 
-  //function to update input fields
+  //function to update inputs:
   const updateInputFunction = (e, inputType) => {
-    if (inputType == "firstName") {
-      setFirstName(e.target.value);
-    } else if (inputType == "lastName") {
-      setLastName(e.target.value);
-    } else if (inputType == "displayName") {
-      setDisplayName(e.target.value);
-    } else if (inputType == "img") {
-      const file = e.target.files[0];
-      if (file.type.startsWith("image/")) {
-        setImg(URL.createObjectURL(file));
-      }
-    } else if (inputType == "description") {
-      setDescription(e.target.value);
-    } else if (inputType == "language") {
-      setNewLanguage(e.target.value);
-    } else if (inputType == "level") {
-      setNewLanguageLevel(e.target.value);
+    const value = e.target.value;
+    switch (inputType) {
+      case "firstName":
+        setFirstName(value);
+        break;
+      case "lastName":
+        setLastName(value);
+        break;
+      case "displayName":
+        setDisplayName(value);
+        break;
+      case "img":
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          setImg(URL.createObjectURL(file));
+        }
+        break;
+      case "description":
+        setDescription(value);
+        break;
+      case "language":
+        setNewLanguage(value);
+        break;
+      case "level":
+        setNewLanguageLevel(value);
+        break;
+      case "country":
+        const selectedCountry = e.target.value;
+        setState(State.getStatesOfCountry(selectedCountry.isoCode));
+        setCurrentCountry(selectedCountry);
+        setCurrentState("");
+        setCurrentCity("");
+        break;
+      case "state":
+        const selectedState = e.target.value;
+        setCity(
+          City.getCitiesOfState(currentCountry.isoCode, selectedState.isoCode)
+        );
+        setCurrentState(selectedState);
+        setCurrentCity("");
+        break;
+      case "city":
+        setCurrentCity(value);
+        break;
+      default:
+        break;
     }
   };
 
@@ -125,7 +159,10 @@ const UpdatePersonalInfo = () => {
       !displayName ||
       !img ||
       !description ||
-      !language
+      !language ||
+      !currentCity ||
+      !currentState ||
+      !currentCountry
     ) {
       return toastFunction(
         "error",
@@ -141,6 +178,9 @@ const UpdatePersonalInfo = () => {
         img: img,
         description: description,
         languages: language,
+        country: currentCountry.name,
+        state: currentState.name,
+        city: currentCity.name,
       })
     );
 
@@ -383,6 +423,75 @@ const UpdatePersonalInfo = () => {
             </div>
           </div>
         </div>
+        <div
+          style={{
+            alignItems: "center",
+          }}
+          className="div_for_line"
+        >
+          <div className="div_for_label">
+            <h4>Location</h4>
+            <span>*</span>
+          </div>
+          <div className="input_field">
+            <FormControl fullWidth>
+              <InputLabel>Country</InputLabel>
+              <Select
+                value={currentCountry.name || ""}
+                label="Country"
+                onChange={(e) => {
+                  updateInputFunction(e, "country");
+                }}
+              >
+                {country.map((c) => {
+                  return (
+                    <MenuItem key={c.isoCode} value={c}>
+                      {c.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>State</InputLabel>
+              <Select
+                value={currentState?.name || ""}
+                label="State"
+                onChange={(e) => {
+                  updateInputFunction(e, "state");
+                }}
+                disabled={!currentCountry}
+              >
+                {state.map((s) => {
+                  return (
+                    <MenuItem key={s.isoCode} value={s}>
+                      {s.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>City</InputLabel>
+              <Select
+                disabled={!currentState}
+                value={currentCity.name || ""}
+                label="City"
+                onChange={(e) => {
+                  updateInputFunction(e, "city");
+                }}
+              >
+                {city.map((ci) => {
+                  return (
+                    <MenuItem key={ci.isoCode} value={ci}>
+                      {ci.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </div>
+        </div>
         <SubmitButton handleSubmitFunction={handleSubmitFunction} />
       </div>
     </Container>
@@ -427,7 +536,6 @@ const Container = styled.div`
         display: flex;
         gap: 10px;
         width: 50%;
-
         .language_add_new_box {
           display: flex;
           justify-content: center;

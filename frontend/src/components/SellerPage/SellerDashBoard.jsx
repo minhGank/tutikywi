@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 
-const SellerDashBoard = ({ currentUser }) => {
+const SellerDashBoard = ({ currentSeller }) => {
   return (
     <Container>
       <div className="intro_div">
-        <h3>Welcome, {currentUser.username} </h3>
+        <h3>Welcome, {currentSeller?.firstName} </h3>
       </div>
       <div className="order_button">
         <h4>Active orders</h4>

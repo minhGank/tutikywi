@@ -51,6 +51,9 @@ const UpdateAccountSecurity = () => {
       !personalInfo.description ||
       !personalInfo.languages ||
       !professionalInfo.age ||
+      !personalInfo.country ||
+      !personalInfo.city ||
+      !personalInfo.state ||
       !phoneNumber ||
       !emailAddress
     ) {
@@ -72,6 +75,9 @@ const UpdateAccountSecurity = () => {
         educationHistory: professionalInfo.educationHistory,
         phoneNumber: phoneNumber,
         email: emailAddress,
+        city: personalInfo.city,
+        country: personalInfo.country,
+        state: personalInfo.state,
       });
 
       if (res.data.success) {

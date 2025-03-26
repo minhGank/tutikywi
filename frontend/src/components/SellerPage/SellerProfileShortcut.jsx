@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const SellerProfileShortcut = ({ currentUser }) => {
+const SellerProfileShortcut = ({ currentSeller }) => {
   return (
     <Container>
       <div className="profile">
         <div className="profile_img">
-          <img src={currentUser.img} />
+          <img src={currentSeller?.img} />
         </div>
-        <div className="profile_username">{currentUser.username}</div>
+        <div className="profile_username">
+          {currentSeller?.firstName} {currentSeller?.lastName}
+        </div>
         <Link to="/seller/profile">View Profile</Link>
       </div>
       <div className="selling_history">

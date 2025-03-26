@@ -1,3 +1,4 @@
+const { fail } = require("assert");
 const Seller = require("../models/SellerModel");
 const User = require("../models/UserModel");
 
@@ -16,6 +17,9 @@ exports.createSellerProfile = async (req, res, next) => {
       educationHistory,
       email,
       phoneNumber,
+      country,
+      city,
+      state,
     } = req.body;
     if (
       !firstName ||
@@ -26,7 +30,10 @@ exports.createSellerProfile = async (req, res, next) => {
       !languages ||
       !phoneNumber ||
       !email ||
-      !age
+      !age ||
+      !state ||
+      !country ||
+      !city
     ) {
       return res.json({ success: false, msg: "Please fill in all the field" });
     }
@@ -55,6 +62,9 @@ exports.createSellerProfile = async (req, res, next) => {
       age,
       email,
       phoneNumber,
+      country,
+      city,
+      state,
     });
     if (educationHistory) {
       newSeller.educationHistory = educationHistory;
@@ -71,6 +81,26 @@ exports.createSellerProfile = async (req, res, next) => {
       newSeller,
       newUser: user,
       msg: "Seller profile created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ msg: error, success: fail });
+    next(error);
+  }
+};
+
+exports.getSeller = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const seller = await Seller.findOne({ userId: userId });
+    if (!seller) {
+      return res.status(401).json({
+        success: false,
+        msg: "Seller profile not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      seller,
     });
   } catch (error) {
     next(error);
